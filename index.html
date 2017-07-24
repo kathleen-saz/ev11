@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.min.css">
+
+  <style>
+
+  body{
+
+  background: linear-gradient(to right, #ACB6E5, #74ebd5);
+}
+
+input[type="number"]{
+  width: 7rem !important;
+}
+
+input[type="submit"]{
+  display: block;
+  margin-top: 2.5rem;
+}
+
+.wrapper{
+  width: 75%;
+  padding: 4rem 4.5rem;
+  background-color: white;
+  margin: 2.5rem auto;
+  border-radius: 0.2rem;
+  box-shadow: 0 0 35px 0 rgba(0,0,0,0.15),0 0 55px 0 rgba(0,0,0,0.05);
+}
+
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <h1> Evolutionary Algorithms </h1>
+    <p>Evolutionary algorithms use mechanisms inspired by biological evolution to output a solution for an optimization problem. </p>
+    <p>
+      Given the equation −xˆ2 + 20x − yˆ2 + 10y − 105, what are the values of x and y that will maximize the result?
+    </p>
+    <p>
+      Genotype: (x,y); Phenotype: result; Fitness: the biggest the result, the best;
+      Generator: random pair of values.
+    </p>
+    <form id="form" onsubmit="event.preventDefault(); doCoolStuff();">
+      <label for="population">Define the initial population size:</label>
+      <input type="number" name="population"  id="population" autofocus/> individuals
+
+      <label for="generations">Define the number of generations the algorithm will run for:</label>
+      <input type="number" name="generations"  id="generations" /> generations
+
+      <input class="button-primary" type="submit" value="Let the evolution run wild">
+    </form>
+    <div id="final-pop">
+
+    </div>
+  </div>
+
+
+  <script>
+
+  function doCoolStuff(){
+    ev11();
+    return false;
+  }
+
+    function ev11(){
+
+    let populationSize = Number(document.getElementById('population').value);
+    let numberOfGenerations = Number(document.getElementById('generations').value);
+
+    let population = [];
+
+    for(let i=0; i< populationSize; i++){
+      population.push(generateGenotype());
+    }
+
+    for(let i=0; i< numberOfGenerations; i++){
+      let random1position = Math.floor(Math.random()*population.length); //get random element of population
+      let random2position = Math.floor(Math.random()*population.length); //get random element of population
+      let random2Mutated = mutate(population[random2position]);
+
+      if(fitness(random2Mutated) > fitness(population[random1position]))
+      {
+        population[random1position] = random2Mutated;
+      }
+    }
+
+    const resultDiv = document.getElementById('final-pop');
+    let str = "";
+
+    population.forEach(i => str += `genotype: (${i[0]},${i[1]}) &nbsp; &nbsp; &nbsp; fitness: ${fitness(i)} <br/>` );
+
+    resultDiv.innerHTML = str;
+
+  }
+
+    function generateGenotype(){
+    let genotype = [getRandomArbitrary(-50,50), getRandomArbitrary(-50,50)];
+    return genotype;
+    }
+
+    function fitness(genotype){
+    var x = genotype[0];
+    var y = genotype[1];
+    return ( - (x*x) + (20*x) - (y*y) + (10*y) - 105 );
+    }
+
+    function mutate(genotype){
+      let direction = coinFlip(); // 0 = up .. 1 = down
+      let side = coinFlip(); // 0 = left .. 1 = right
+      let left = 0;
+
+      if(side === left)
+      {
+        return [changeValue(genotype[0], direction), genotype[1]]; //mutant
+      }
+      else
+      {
+        return [genotype[0], changeValue(genotype[1], direction)]; //mutant
+      }
+
+    }
+
+    function coinFlip() {
+      return Math.floor(Math.random() * 2);
+     }
+
+     function changeValue(val, direction) {
+        if(direction === 0){ //up
+          return getRandomArbitrary(val,50);
+        }
+        else{ //down
+          return getRandomArbitrary(-50,val);
+        }
+      }
+
+    function getRandomArbitrary(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+  </script>
+</body>
+</html>
